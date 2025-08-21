@@ -1,8 +1,8 @@
 import click
 from jira import JIRA
 
-from jira_mine import issues
-from jira_mine.output import print_table, write_csv
+from jiraport import issues
+from jiraport.output import print_table, write_csv
 
 DEFAULT_JQL = """
 type = Story AND labels IN (G-DSP, G-SSP, G-Platform, G-Data) AND labels NOT IN (Cadent) AND status = Done AND project = GCM

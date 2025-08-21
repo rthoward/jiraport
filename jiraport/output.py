@@ -3,8 +3,8 @@ import csv
 from rich.console import Console
 from rich.table import Table
 
-from jira_mine import issues
-from jira_mine.utils import half_days, hr_date
+from jiraport import issues
+from jiraport.utils import half_days, hr_date
 
 
 def print_table(summaries: list[issues.IssueSummary]):
