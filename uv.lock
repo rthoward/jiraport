@@ -108,9 +108,9 @@ wheels = [
 ]
 
 [[package]]
-name = "jira-mine"
+name = "jiraport"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "click" },
     { name = "jira" },

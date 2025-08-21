@@ -1,7 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "jira-mine"
+name = "jiraport"
 version = "0.1.0"
-description = "Add your description here"
+description = "A CLI tool for generating reports from JIRA issues using JQL queries"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -11,6 +15,9 @@ dependencies = [
     "requests>=2.32.5",
     "rich>=14.1.0",
 ]
+
+[project.scripts]
+jiraport = "jiraport.main:cli"
 
 [dependency-groups]
 dev = [
