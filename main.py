@@ -1,6 +1,6 @@
 import csv
+from decimal import Decimal, ROUND_UP
 from dataclasses import dataclass
-from enum import Enum
 import os
 from typing import cast
 from typing_extensions import Optional
@@ -78,11 +78,13 @@ def summarize(issue: Issue) -> IssueSummary:
                 if item.fromString in IN_PROGRESS_STATUSES:
                     time_dev += (date_current - date_previous)
 
-                if item.toString in IN_PROGRESS_STATUSES:
-                    date_in_dev = date_current
-                elif item.toString == "Code Review":
+                if item.toString == "Code Review":
                     date_code_review = date_current
-                elif item.toString == "Done":
+
+                if item.toString in IN_PROGRESS_STATUSES and date_in_dev is None:
+                    date_in_dev = date_current
+
+                if item.toString == "Done":
                     date_done = date_current
 
         date_previous = date_current
@@ -105,6 +107,16 @@ def hr_date(dt: Optional[pendulum.DateTime]):
     return dt.format("MM/DD/YYYY") if dt else ""
 
 
+def half_days(dur: pendulum.Duration) -> Decimal:
+    if dur.total_seconds() < 1:
+        return Decimal("0")
+
+    days = Decimal(dur.total_days())
+    half_days = (days * 2).quantize(Decimal("1"), rounding=ROUND_UP)
+    days_rounded = (half_days / 2).quantize(Decimal("0.5"))
+    return max(days_rounded, Decimal("0.5"))
+
+
 def print_table(summaries: list[IssueSummary]):
     table = Table(title="Issue Summaries", expand=True)
     table.add_column("ID", no_wrap=True)
@@ -113,9 +125,9 @@ def print_table(summaries: list[IssueSummary]):
     table.add_column("Code Review Date", no_wrap=True)
     table.add_column("Done Date", no_wrap=True)
     table.add_column("Blocked?", no_wrap=True)
-    table.add_column("Time Blocked", no_wrap=True)
-    table.add_column("Time In Dev", no_wrap=True)
-    table.add_column("Time In Dev + Blocked", no_wrap=True)
+    table.add_column("Days Blocked", no_wrap=True)
+    table.add_column("Days In Dev", no_wrap=True)
+    table.add_column("Days In Dev + Blocked", no_wrap=True)
 
     for summary in summaries:
         table.add_row(
@@ -125,9 +137,9 @@ def print_table(summaries: list[IssueSummary]):
             hr_date(summary.date_code_review),
             hr_date(summary.date_done),
             "Yes" if summary.time_blocked.total_seconds() > 0 else "No",
-            str(summary.time_blocked) if summary.time_blocked.total_seconds() > 0 else "",
-            str(summary.time_dev),
-            str(summary.time_dev + summary.time_blocked),
+            str(half_days(summary.time_blocked)),
+            str(half_days(summary.time_dev)),
+            str(half_days(summary.time_dev) + half_days(summary.time_blocked))
         )
 
     console = Console(width=240)
@@ -144,8 +156,6 @@ def print_csv(summaries: list[IssueSummary]):
 
 
 def to_csv_row(summary: IssueSummary):
-    in_dev_and_blocked = summary.time_dev + summary.time_blocked
-
     return {
         "ID": summary.id,
         "Story Points": summary.story_points,
@@ -153,9 +163,9 @@ def to_csv_row(summary: IssueSummary):
         "Date Code Review": hr_date(summary.date_code_review),
         "Date Done": hr_date(summary.date_done),
         "Blocked?": "Yes" if summary.time_blocked.total_seconds() > 0 else "No",
-        "Time Blocked": str(summary.time_blocked) if summary.time_blocked.total_seconds() > 0 else "",
-        "Time In Dev": str(summary.time_dev) if summary.time_dev.total_seconds() > 0 else "",
-        "Time In Dev + Blocked": str(in_dev_and_blocked) if in_dev_and_blocked.total_seconds() > 0 else "",
+        "Days Blocked": str(half_days(summary.time_blocked)),
+        "Days In Dev": str(half_days(summary.time_dev)),
+        "Days In Dev + Blocked": half_days(summary.time_dev) + half_days(summary.time_blocked),
     }
 
 
