@@ -18,7 +18,7 @@ SERVER = os.environ["JIRA_SERVER"]
 
 TZ = pendulum.timezone("America/New_York")
 ISSUE_FIELDS = "status,changelog,created"
-IN_PROGRESS_STATUSES = {"Development"}
+IN_PROGRESS_STATUSES = {"Development", "Code Review", "Checked In", "QA", "Product Acceptance"}
 
 JQL = """
 type = Story AND labels IN (G-DSP, G-SSP, G-Platform, G-Data) AND labels NOT IN (Cadent) AND status = Done AND project = GCM
@@ -130,7 +130,7 @@ def print_table(summaries: list[IssueSummary]):
             str(summary.time_dev + summary.time_blocked),
         )
 
-    console = Console(width=200)
+    console = Console(width=240)
     console.print(table)
 
 
@@ -144,6 +144,8 @@ def print_csv(summaries: list[IssueSummary]):
 
 
 def to_csv_row(summary: IssueSummary):
+    in_dev_and_blocked = summary.time_dev + summary.time_blocked
+
     return {
         "ID": summary.id,
         "Story Points": summary.story_points,
@@ -152,8 +154,8 @@ def to_csv_row(summary: IssueSummary):
         "Date Done": hr_date(summary.date_done),
         "Blocked?": "Yes" if summary.time_blocked.total_seconds() > 0 else "No",
         "Time Blocked": str(summary.time_blocked) if summary.time_blocked.total_seconds() > 0 else "",
-        "Time In Dev": str(summary.time_dev),
-        "Time In Dev + Blocked": str(summary.time_dev + summary.time_blocked),
+        "Time In Dev": str(summary.time_dev) if summary.time_dev.total_seconds() > 0 else "",
+        "Time In Dev + Blocked": str(in_dev_and_blocked) if in_dev_and_blocked.total_seconds() > 0 else "",
     }
 
 
