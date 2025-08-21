@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "click>=8.1.0",
     "jira>=3.10.5",
     "pendulum>=3.1.0",
     "requests>=2.32.5",
