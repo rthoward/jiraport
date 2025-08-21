@@ -50,7 +50,7 @@ class IssueSummary:
 
 
 def summarize(issue: Issue) -> IssueSummary:
-    story_points = "todo"
+    story_points = ""
     time_blocked = pendulum.Duration()
     time_dev = pendulum.Duration()
 
