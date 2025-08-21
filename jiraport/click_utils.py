@@ -1,6 +1,7 @@
 import click
 import pendulum
 
+
 class DateParamtype(click.ParamType):
     name = "date"
 

@@ -61,7 +61,9 @@ def summarize(ctx, jql, limit, output):
     click.echo(f"{jql}\n")
 
     limit = False if limit is None else limit
-    jira_issues = j.search_issues(jql, maxResults=limit, expand="changelog")
+    jira_issues = j.search_issues(
+        jql, maxResults=limit, expand="changelog", fields="id,created"
+    )
 
     click.echo(f"Found {len(jira_issues)} issues. Summarizing...")
     summaries = [issues.summarize(issue) for issue in jira_issues]
@@ -74,9 +76,33 @@ def summarize(ctx, jql, limit, output):
         click.echo("CSV output written to output.csv")
 
 
+@cli.command()
+@click.argument("start_date", type=DateParamtype())
+@click.argument("end_date", type=DateParamtype())
+@click.pass_context
+def weekly_load(ctx, start_date, end_date):
+    j = _jira_connect(**ctx.obj["jira_config"])
+
+    jql = f"""
+        project = GCM AND
+        status CHANGED TO 'Development' during ({start_date}, {end_date})
+    """
+
+    click.echo("Searching with JQL:")
+    click.echo(f"{jql}\n")
+
+    jira_issues = j.search_issues(
+        jql, maxResults=10, expand="changelog", fields="id,created"
+    )
+
+    for issue in jira_issues:
+        for history in issue.changelog.histories:
+            print(history)
+
+
 def _jira_connect(*, server, email, token) -> JIRA:
     click.echo("Connecting to JIRA server...", nl=False)
-    j = JIRA( server=server, basic_auth=(email, token), )
+    j = JIRA(server=server, basic_auth=(email, token))
     click.echo("done.\n")
 
     return j
