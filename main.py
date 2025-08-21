@@ -36,7 +36,7 @@ class IssueSummary:
     id: str
     status: str
     story_points: Optional[str]
-    time_blocked: Optional[pendulum.Duration]
+    time_blocked: pendulum.Duration
     date_created: Optional[pendulum.DateTime]
     date_in_progress: Optional[pendulum.DateTime]
     date_code_review: Optional[pendulum.DateTime]
@@ -46,7 +46,8 @@ class IssueSummary:
 def summarize(issue: Issue) -> IssueSummary:
     date_created = cast(pendulum.DateTime, pendulum.parse(issue.fields.created))
     story_points = "todo"
-    time_blocked: Optional[pendulum.Duration] = None
+    time_blocked = pendulum.Duration()
+    blocked_start = None
     date_in_progress = None
     date_code_review = None
     date_done = None
@@ -59,6 +60,12 @@ def summarize(issue: Issue) -> IssueSummary:
 
         for item in history.items:
             if item.field == "status":
+                if blocked_start and item.toString != "Blocked":
+                    time_blocked += (dt - blocked_start)
+                    blocked_start = None
+                elif item.toString == "Blocked":
+                    blocked_start = dt
+
                 if item.toString in IN_PROGRESS_STATUSES:
                     date_in_progress = dt
                 elif item.toString == "Code Review":
