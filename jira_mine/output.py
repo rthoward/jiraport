@@ -29,7 +29,7 @@ def print_table(summaries: list[issues.IssueSummary]):
             "Yes" if summary.time_blocked.total_seconds() > 0 else "No",
             str(half_days(summary.time_blocked)),
             str(half_days(summary.time_dev)),
-            str(half_days(summary.time_dev) + half_days(summary.time_blocked))
+            str(half_days(summary.time_dev) + half_days(summary.time_blocked)),
         )
 
     console = Console(width=240)
@@ -56,5 +56,6 @@ def to_csv_row(summary: issues.IssueSummary):
         "Blocked?": "Yes" if summary.time_blocked.total_seconds() > 0 else "No",
         "Days Blocked": str(half_days(summary.time_blocked)),
         "Days In Dev": str(half_days(summary.time_dev)),
-        "Days In Dev + Blocked": half_days(summary.time_dev) + half_days(summary.time_blocked),
+        "Days In Dev + Blocked": half_days(summary.time_dev)
+        + half_days(summary.time_blocked),
     }

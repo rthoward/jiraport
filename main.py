@@ -14,6 +14,7 @@ JQL = """
 type = Story AND labels IN (G-DSP, G-SSP, G-Platform, G-Data) AND labels NOT IN (Cadent) AND status = Done AND project = GCM
 """
 
+
 def main():
     j = JIRA(server=SERVER, basic_auth=(EMAIL, API_TOKEN))
 

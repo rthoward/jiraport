@@ -3,6 +3,7 @@ from typing_extensions import Optional
 
 import pendulum
 
+
 def hr_date(dt: Optional[pendulum.DateTime]):
     return dt.format("MM/DD/YYYY") if dt else ""
 

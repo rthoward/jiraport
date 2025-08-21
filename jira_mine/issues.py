@@ -7,7 +7,13 @@ import pendulum
 
 
 TZ = pendulum.timezone("America/New_York")
-IN_PROGRESS_STATUSES = {"Development", "Code Review", "Checked In", "QA", "Product Acceptance"}
+IN_PROGRESS_STATUSES = {
+    "Development",
+    "Code Review",
+    "Checked In",
+    "QA",
+    "Product Acceptance",
+}
 
 
 @dataclass
@@ -46,13 +52,13 @@ def summarize(issue: Issue) -> IssueSummary:
         for item in history.items:
             if item.field == "status":
                 if date_blocked_start and item.toString != "Blocked":
-                    time_blocked += (date_current - date_blocked_start)
+                    time_blocked += date_current - date_blocked_start
                     date_blocked_start = None
                 elif item.toString == "Blocked":
                     date_blocked_start = date_current
 
                 if item.fromString in IN_PROGRESS_STATUSES:
-                    time_dev += (date_current - date_previous)
+                    time_dev += date_current - date_previous
 
                 if item.toString == "Code Review":
                     date_code_review = date_current
@@ -64,7 +70,6 @@ def summarize(issue: Issue) -> IssueSummary:
                     date_done = date_current
 
         date_previous = date_current
-
 
     return IssueSummary(
         id=issue.key,
