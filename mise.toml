@@ -9,3 +9,9 @@ run = "uv run ruff format"
 
 [tasks.lint]
 run = "uv run ruff check"
+
+[tasks.build]
+run = "uv run nuitka --standalone --output-filename=jira-mine --output-dir=dist --assume-yes-for-downloads --enable-plugin=anti-bloat --nofollow-import-to=pytest,setuptools,distutils --prefer-source-code --python-flag=no_site main.py"
+
+[tasks.clean]
+run = "rm -rf dist/ main.build/ main.dist/ *.build/ *.dist/"
