@@ -1,7 +1,7 @@
 [env]
 _.file = { path = ".env.json", redact = true }
 
-[tasks.run]
+[tasks.dev]
 run = "uv run main.py"
 
 [tasks.format]
