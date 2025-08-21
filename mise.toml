@@ -1,14 +1,17 @@
 [env]
 _.file = { path = ".env.json", redact = true }
 
-[tasks.dev]
-run = "uv run jiraport/main.py"
-
 [tasks.format]
 run = "uv run ruff format"
 
 [tasks.lint]
 run = "uv run ruff check"
+
+[tasks.dev]
+run = "uv run jiraport/main.py"
+
+[tasks.repl]
+run = "uv run jiraport/repl.py"
 
 [tasks.build]
 run = "uv run nuitka --standalone --output-filename=jira-mine --output-dir=dist --assume-yes-for-downloads --enable-plugin=anti-bloat --nofollow-import-to=pytest,setuptools,distutils --prefer-source-code --python-flag=no_site main.py"
