@@ -95,15 +95,15 @@ def hr_date(dt: Optional[pendulum.DateTime]):
 
 
 def print_table(summaries: list[IssueSummary]):
-    table = Table(title="Issue Summaries")
-    table.add_column("ID", style="cyan")
-    table.add_column("Status", style="green")
-    table.add_column("Story Points")
-    table.add_column("Time Blocked")
-    table.add_column("Created Date", style="yellow")
-    table.add_column("In Progress Date", style="yellow")
-    table.add_column("Code Review Date", style="yellow")
-    table.add_column("Done Date", style="yellow")
+    table = Table(title="Issue Summaries", expand=True)
+    table.add_column("ID", no_wrap=True)
+    table.add_column("Status", no_wrap=True)
+    table.add_column("Story Points", no_wrap=True)
+    table.add_column("Time Blocked", no_wrap=True)
+    table.add_column("Created Date", no_wrap=True)
+    table.add_column("In Progress Date", no_wrap=True)
+    table.add_column("Code Review Date", no_wrap=True)
+    table.add_column("Done Date", no_wrap=True)
 
     for summary in summaries:
         table.add_row(
@@ -117,7 +117,7 @@ def print_table(summaries: list[IssueSummary]):
             hr_date(summary.date_done)
         )
 
-    console = Console()
+    console = Console(width=120)
     console.print(table)
 
 
