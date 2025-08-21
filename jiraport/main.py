@@ -54,14 +54,7 @@ def cli(ctx, server, email, token):
 def summarize(ctx, jql, limit, output):
     """Summarize JIRA issues matching the given JQL query."""
 
-    jira_config = ctx.obj["jira_config"]
-
-    click.echo("Connecting to JIRA server...", nl=False)
-    j = JIRA(
-        server=jira_config["server"],
-        basic_auth=(jira_config["email"], jira_config["token"]),
-    )
-    click.echo("done.\n")
+    j = _jira_connect(**ctx.obj["jira_config"])
 
     click.echo("Searching with JQL:")
     click.echo(f"{jql}\n")
@@ -78,6 +71,14 @@ def summarize(ctx, jql, limit, output):
     if "csv" in output:
         write_csv(summaries)
         click.echo("CSV output written to output.csv")
+
+
+def _jira_connect(*, server, email, token) -> JIRA:
+    click.echo("Connecting to JIRA server...", nl=False)
+    j = JIRA( server=server, basic_auth=(email, token), )
+    click.echo("done.\n")
+
+    return j
 
 
 if __name__ == "__main__":
