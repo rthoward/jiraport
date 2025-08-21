@@ -37,9 +37,9 @@ def cli(ctx, server, email, token):
 @cli.command()  # type: ignore
 @click.option("--jql", default=DEFAULT_JQL.strip(), help="JQL query to execute")
 @click.option(
-    "--max-results",
+    "--limit",
     type=int,
-    help="Maximum number of results to return (default: no limit)",
+    help="Maximum number of issues to retrieve. Default: unlimited",
 )
 @click.option(
     "--output",
@@ -47,7 +47,7 @@ def cli(ctx, server, email, token):
     help="Output format. Accepted: csv, table",
 )
 @click.pass_context
-def summarize(ctx, jql, max_results, output):
+def summarize(ctx, jql, limit, output):
     """Summarize JIRA issues matching the given JQL query."""
 
     jira_config = ctx.obj["jira_config"]
@@ -61,8 +61,8 @@ def summarize(ctx, jql, max_results, output):
     )
 
     click.echo("Searching for issues...")
-    max_results = False if max_results is None else max_results
-    jira_issues = j.search_issues(jql, maxResults=max_results, expand="changelog")
+    limit = False if limit is None else limit
+    jira_issues = j.search_issues(jql, maxResults=limit, expand="changelog")
 
     click.echo(f"Found {len(jira_issues)} issues. Summarizing...")
     summaries = [issues.summarize(issue) for issue in jira_issues]
