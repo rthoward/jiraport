@@ -2,6 +2,7 @@ import click
 from jira import JIRA
 
 from jiraport import issues
+from jiraport.click_utils import DateParamtype
 from jiraport.output import print_table, write_csv
 
 DEFAULT_JQL = """
