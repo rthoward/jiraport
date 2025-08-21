@@ -5,8 +5,10 @@ from typing import cast
 from typing_extensions import Optional
 
 from jira import JIRA
-from jira.resources import Issue, Status
+from jira.resources import Issue
 import pendulum
+from rich.console import Console
+from rich.table import Table
 
 EMAIL = os.environ["JIRA_EMAIL"]
 API_TOKEN = os.environ["JIRA_TOKEN"]
@@ -24,11 +26,9 @@ def main():
     j = JIRA(server=SERVER, basic_auth=(EMAIL, API_TOKEN))
 
     issues = j.search_issues(JQL, maxResults=1, expand="changelog")
+    summaries = [summarize(issue) for issue in issues]
 
-    for issue in issues:
-        summary = summarize(issue)
-        print(summary)
-        print(to_csv_row(summary))
+    print_table(summaries)
 
 
 @dataclass
@@ -59,8 +59,6 @@ def summarize(issue: Issue) -> IssueSummary:
 
         for item in history.items:
             if item.field == "status":
-                print(f"[{dt}] {item.fromString} -> {item.toString}")
-
                 if item.toString in IN_PROGRESS_STATUSES:
                     date_in_progress = dt
                 elif item.toString == "Code Review":
@@ -94,6 +92,34 @@ def to_csv_row(summary: IssueSummary):
 
 def hr_date(dt: Optional[pendulum.DateTime]):
     return dt.format("MM/DD/YYYY") if dt else ""
+
+
+def print_table(summaries: list[IssueSummary]):
+    table = Table(title="Issue Summaries")
+    table.add_column("ID", style="cyan")
+    table.add_column("Status", style="green")
+    table.add_column("Story Points")
+    table.add_column("Time Blocked")
+    table.add_column("Created Date", style="yellow")
+    table.add_column("In Progress Date", style="yellow")
+    table.add_column("Code Review Date", style="yellow")
+    table.add_column("Done Date", style="yellow")
+
+    for summary in summaries:
+        table.add_row(
+            summary.id,
+            summary.status,
+            str(summary.story_points) if summary.story_points else "",
+            str(summary.time_blocked) if summary.time_blocked else "",
+            hr_date(summary.date_created),
+            hr_date(summary.date_in_progress),
+            hr_date(summary.date_code_review),
+            hr_date(summary.date_done)
+        )
+
+    console = Console()
+    console.print(table)
+
 
 if __name__ == "__main__":
     main()
