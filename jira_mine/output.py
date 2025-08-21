@@ -32,7 +32,11 @@ def print_table(summaries: list[issues.IssueSummary]):
             str(half_days(summary.time_dev) + half_days(summary.time_blocked)),
         )
 
-    console = Console(width=240)
+    console = Console()
+
+    # Hack for terminal multiplexers which often misrepresent terminal size.
+    console.width = 240 if console.width == 80 else console.width
+
     console.print(table)
 
 
