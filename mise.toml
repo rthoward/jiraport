@@ -3,3 +3,9 @@ _.file = { path = ".env.json", redact = true }
 
 [tasks.run]
 run = "uv run main.py"
+
+[tasks.format]
+run = "uv run ruff format"
+
+[tasks.lint]
+run = "uv run ruff check"

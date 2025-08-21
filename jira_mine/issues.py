@@ -43,9 +43,7 @@ def summarize(issue: Issue) -> IssueSummary:
     date_code_review = None
     date_done = None
 
-    sort_key = lambda h: pendulum.parse(h.created)
-
-    for history in sorted(issue.changelog.histories, key=sort_key):
+    for history in sorted(issue.changelog.histories, key=_created):
         date_current = cast(pendulum.DateTime, pendulum.parse(history.created))
         date_current = TZ.convert(date_current)
 
@@ -82,3 +80,7 @@ def summarize(issue: Issue) -> IssueSummary:
         date_code_review=date_code_review,
         date_done=date_done,
     )
+
+
+def _created(issue_history):
+    return pendulum.parse(issue_history.created)
