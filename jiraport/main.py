@@ -5,7 +5,9 @@ from jiraport import issues
 from jiraport.output import print_table, write_csv
 
 DEFAULT_JQL = """
-type = Story AND labels IN (G-DSP, G-SSP, G-Platform, G-Data) AND labels NOT IN (Cadent) AND status = Done AND project = GCM
+type = Story AND status = Done AND project = GCM AND
+labels IN (G-DSP, G-SSP, G-Platform, G-Data) AND
+labels NOT IN (Cadent)
 """
 
 
@@ -54,15 +56,16 @@ def summarize(ctx, jql, limit, output):
 
     jira_config = ctx.obj["jira_config"]
 
-    click.echo(f"Connecting to JIRA server: {jira_config['server']}")
-    click.echo(f"Using JQL: {jql}")
-
+    click.echo("Connecting to JIRA server...", nl=False)
     j = JIRA(
         server=jira_config["server"],
         basic_auth=(jira_config["email"], jira_config["token"]),
     )
+    click.echo("done.\n")
 
-    click.echo("Searching for issues...")
+    click.echo("Searching with JQL:")
+    click.echo(f"{jql}\n")
+
     limit = False if limit is None else limit
     jira_issues = j.search_issues(jql, maxResults=limit, expand="changelog")
 
@@ -75,6 +78,7 @@ def summarize(ctx, jql, limit, output):
     if "csv" in output:
         write_csv(summaries)
         click.echo("CSV output written to output.csv")
+
 
 if __name__ == "__main__":
     cli()  # type: ignore
