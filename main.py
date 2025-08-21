@@ -27,7 +27,7 @@ type = Story AND labels IN (G-DSP, G-SSP, G-Platform, G-Data) AND labels NOT IN 
 def main():
     j = JIRA(server=SERVER, basic_auth=(EMAIL, API_TOKEN))
 
-    issues = j.search_issues(JQL, maxResults=1, expand="changelog")
+    issues = j.search_issues(JQL, maxResults=False, expand="changelog")
     summaries = [summarize(issue) for issue in issues]
 
     print_table(summaries)
