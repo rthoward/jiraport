@@ -7,7 +7,7 @@ import pendulum
 
 
 TZ = pendulum.timezone("America/New_York")
-IN_PROGRESS_STATUSES = {
+IN_DEV_STATUSES = {
     "Development",
     "Code Review",
     "Checked In",
@@ -44,28 +44,33 @@ def summarize(issue: Issue) -> IssueSummary:
     date_done = None
 
     for history in sorted(issue.changelog.histories, key=_created):
+        status_items = [item for item in history.items if item.field == "status"]
         date_current = cast(pendulum.DateTime, pendulum.parse(history.created))
         date_current = TZ.convert(date_current)
 
-        for item in history.items:
-            if item.field == "status":
-                if date_blocked_start and item.toString != "Blocked":
-                    time_blocked += date_current - date_blocked_start
-                    date_blocked_start = None
-                elif item.toString == "Blocked":
-                    date_blocked_start = date_current
+        for item in status_items:
+            # Track total blocked time.
+            # For items entering a Blocked state, mark the time.
+            # For items leaving a Blocked state, add the blocked duration to our total.
+            if item.toString == "Blocked":
+                date_blocked_start = date_current
+            elif date_blocked_start and item.toString != "Blocked":
+                time_blocked += date_current - date_blocked_start
+                date_blocked_start = None
 
-                if item.fromString in IN_PROGRESS_STATUSES:
-                    time_dev += date_current - date_previous
+            # Track total in_dev time.
+            if item.fromString in IN_DEV_STATUSES:
+                time_dev += date_current - date_previous
 
-                if item.toString == "Code Review":
-                    date_code_review = date_current
+            # Track the date of the first in_dev status.
+            if item.toString in IN_DEV_STATUSES and date_in_dev is None:
+                date_in_dev = date_current
 
-                if item.toString in IN_PROGRESS_STATUSES and date_in_dev is None:
-                    date_in_dev = date_current
+            if item.toString == "Code Review":
+                date_code_review = date_current
 
-                if item.toString == "Done":
-                    date_done = date_current
+            if item.toString == "Done":
+                date_done = date_current
 
         date_previous = date_current
 
