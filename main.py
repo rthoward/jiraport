@@ -31,7 +31,7 @@ def main():
     summaries = [summarize(issue) for issue in issues]
 
     print_table(summaries)
-    print_csv(summaries)
+    write_csv(summaries)
 
 
 @dataclass
@@ -146,13 +146,14 @@ def print_table(summaries: list[IssueSummary]):
     console.print(table)
 
 
-def print_csv(summaries: list[IssueSummary]):
+def write_csv(summaries: list[IssueSummary]):
     rows = [to_csv_row(summary) for summary in summaries]
     fieldnames = rows[0].keys()
 
-    writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
-    writer.writeheader()
-    writer.writerows(rows)
+    with open("output.csv", "w") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 def to_csv_row(summary: IssueSummary):
