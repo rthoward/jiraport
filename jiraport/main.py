@@ -43,7 +43,9 @@ def cli(ctx, server, email, token):
 )
 @click.option(
     "--output",
-    default="csv",
+    "-o",
+    multiple=True,
+    default=["table", "csv"],
     help="Output format. Accepted: csv, table",
 )
 @click.pass_context
@@ -67,14 +69,12 @@ def summarize(ctx, jql, limit, output):
     click.echo(f"Found {len(jira_issues)} issues. Summarizing...")
     summaries = [issues.summarize(issue) for issue in jira_issues]
 
-    if output == "table":
+    if "table" in output:
         print_table(summaries)
-    elif output == "csv":
+
+    if "csv" in output:
         write_csv(summaries)
         click.echo("CSV output written to output.csv")
-    else:
-        raise ValueError(f"Invalid output format: {output}")
-
 
 if __name__ == "__main__":
     cli()  # type: ignore
