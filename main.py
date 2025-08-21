@@ -1,8 +1,10 @@
+import csv
 from dataclasses import dataclass
 from enum import Enum
 import os
 from typing import cast
 from typing_extensions import Optional
+import sys
 
 from jira import JIRA
 from jira.resources import Issue
@@ -29,6 +31,7 @@ def main():
     summaries = [summarize(issue) for issue in issues]
 
     print_table(summaries)
+    print_csv(summaries)
 
 
 @dataclass
@@ -98,18 +101,6 @@ def summarize(issue: Issue) -> IssueSummary:
     )
 
 
-def to_csv_row(summary: IssueSummary):
-    fields = [
-        summary.id,
-        summary.story_points,
-        hr_date(summary.date_in_dev),
-        hr_date(summary.date_code_review),
-        hr_date(summary.date_done)
-    ]
-
-    return ",".join(fields)
-
-
 def hr_date(dt: Optional[pendulum.DateTime]):
     return dt.format("MM/DD/YYYY") if dt else ""
 
@@ -141,6 +132,29 @@ def print_table(summaries: list[IssueSummary]):
 
     console = Console(width=200)
     console.print(table)
+
+
+def print_csv(summaries: list[IssueSummary]):
+    rows = [to_csv_row(summary) for summary in summaries]
+    fieldnames = rows[0].keys()
+
+    writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(rows)
+
+
+def to_csv_row(summary: IssueSummary):
+    return {
+        "ID": summary.id,
+        "Story Points": summary.story_points,
+        "Date In Dev": hr_date(summary.date_in_dev),
+        "Date Code Review": hr_date(summary.date_code_review),
+        "Date Done": hr_date(summary.date_done),
+        "Blocked?": "Yes" if summary.time_blocked.total_seconds() > 0 else "No",
+        "Time Blocked": str(summary.time_blocked) if summary.time_blocked.total_seconds() > 0 else "",
+        "Time In Dev": str(summary.time_dev),
+        "Time In Dev + Blocked": str(summary.time_dev + summary.time_blocked),
+    }
 
 
 if __name__ == "__main__":
