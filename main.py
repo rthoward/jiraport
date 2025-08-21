@@ -67,7 +67,7 @@ def summarize(issue: Issue) -> IssueSummary:
                     date_done = dt
 
     return IssueSummary(
-        id=issue.id,
+        id=issue.key,
         status=issue.fields.status.name,
         story_points=story_points,
         time_blocked=time_blocked,
