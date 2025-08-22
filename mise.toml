@@ -10,6 +10,9 @@ run = "uv run ruff check"
 [tasks.dev]
 run = "uv run jiraport/main.py"
 
+[tasks.test]
+run = "uv run pytest"
+
 [tasks.repl]
 run = "uv run jiraport/repl.py"
 

@@ -18,3 +18,10 @@ main.dist/
 .env.json
 output.json
 output.csv
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+tests/cassettes/*
