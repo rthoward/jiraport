@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import cast
 from typing_extensions import Optional
 
 import pendulum
@@ -38,7 +37,7 @@ def summarize(issue: Issue) -> IssueSummary:
     time_blocked = pendulum.Duration()
     time_dev = pendulum.Duration()
 
-    date_created = cast(pendulum.DateTime, pendulum.parse(issue.fields.created))
+    date_created = parse_dt(issue.fields.created)
     date_previous = date_created
     date_blocked_start = None
     date_in_dev = None

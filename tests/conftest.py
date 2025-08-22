@@ -1,5 +1,7 @@
-import pytest
+import os
 from unittest.mock import Mock
+
+import pytest
 
 
 @pytest.fixture(scope="session")
@@ -42,7 +44,7 @@ def mock_jira_client():
 @pytest.fixture
 def jira_config():
     return {
-        "server": "https://test.atlassian.net",
-        "email": "test@example.com",
-        "token": "test-token",
+        "server": os.environ["JIRA_SERVER"],
+        "email": os.environ["JIRA_EMAIL"],
+        "token": os.environ["JIRA_TOKEN"],
     }
