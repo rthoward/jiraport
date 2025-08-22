@@ -89,5 +89,23 @@ def summarize(issue: Issue) -> IssueSummary:
     )
 
 
+def status_on(issue: Issue, date: pendulum.Date) -> str:
+    status = "Created"
+
+    for history in sorted(issue.changelog.histories, key=_created):
+        date_current = cast(pendulum.DateTime, pendulum.parse(history.created))
+        date_current = TZ.convert(date_current)
+
+        if date_current.date() > date:
+            break
+
+        status_items = [item for item in history.items if item.field == "status"]
+
+        for item in status_items:
+            status = item.toString
+
+    return status
+
+
 def _created(issue_history):
     return pendulum.parse(issue_history.created)

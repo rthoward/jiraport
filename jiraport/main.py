@@ -1,9 +1,12 @@
 import click
 from jira import JIRA
 
+from pendulum import Date
+
 from jiraport import issues
 from jiraport.click_utils import DateParamtype
 from jiraport.output import print_table, write_csv
+from jiraport.utils import week_intervals
 
 DEFAULT_JQL = """
 type = Story AND status = Done AND project = GCM AND
@@ -80,24 +83,21 @@ def summarize(ctx, jql, limit, output):
 @click.argument("start_date", type=DateParamtype())
 @click.argument("end_date", type=DateParamtype())
 @click.pass_context
-def weekly_load(ctx, start_date, end_date):
+def weekly_load(ctx, start_date: Date, end_date: Date):
     j = _jira_connect(**ctx.obj["jira_config"])
 
-    jql = f"""
-        project = GCM AND
-        status CHANGED TO 'Development' during ({start_date}, {end_date})
-    """
+    for i_start, i_end in week_intervals(start_date, end_date):
+        jql = f"""
+            project = GCM AND
+            status CHANGED TO 'Development' during ({start_date}, {end_date})
+        """
 
-    click.echo("Searching with JQL:")
-    click.echo(f"{jql}\n")
+        jira_issues = j.search_issues(
+            jql, maxResults=10, expand="changelog", fields="id,created"
+        )
 
-    jira_issues = j.search_issues(
-        jql, maxResults=10, expand="changelog", fields="id,created"
-    )
-
-    for issue in jira_issues:
-        for history in issue.changelog.histories:
-            print(history)
+        for issue in jira_issues:
+            print(issues.status_on(issue, i_start))
 
 
 def _jira_connect(*, server, email, token) -> JIRA:
