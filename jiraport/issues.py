@@ -2,11 +2,13 @@ from dataclasses import dataclass
 from typing import cast
 from typing_extensions import Optional
 
-from jira.resources import Issue
 import pendulum
 
+from jira.resources import Issue
 
-TZ = pendulum.timezone("America/New_York")
+from jiraport.utils import TZ
+
+
 IN_DEV_STATUSES = {
     "Development",
     "Code Review",
