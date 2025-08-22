@@ -10,5 +10,5 @@ class DateParamtype(click.ParamType):
     def convert(self, value: str, param, ctx):
         try:
             return pendulum.from_format(value, "MM/DD/YYYY", tz=TZ).date()
-        except:
+        except:  # noqa
             self.fail(f"{value!r}. Example: '12/31/2025'", param, ctx)
