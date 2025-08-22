@@ -1,6 +1,6 @@
 from decimal import Decimal, ROUND_UP
 from typing import Tuple
-from typing_extensions import Optional
+from typing_extensions import Optional, cast
 
 import pendulum
 from pendulum import Date, DateTime, Duration
@@ -33,3 +33,12 @@ def week_intervals(start_date: Date, end_date: Date) -> list[Tuple[Date, Date]]:
         interval_end = interval_start.end_of("week")
 
     return intervals
+
+
+def parse_dt(s: str) -> DateTime:
+    dt = cast(DateTime, pendulum.parse(s))
+    return TZ.convert(dt)
+
+
+def parse_date(s: str) -> Date:
+    return parse_dt(s).date()

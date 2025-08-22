@@ -6,7 +6,7 @@ import pendulum
 
 from jira.resources import Issue
 
-from jiraport.utils import TZ
+from jiraport.utils import parse_dt, parse_date
 
 
 IN_DEV_STATUSES = {
@@ -47,8 +47,7 @@ def summarize(issue: Issue) -> IssueSummary:
 
     for history in sorted(issue.changelog.histories, key=_created):
         status_items = [item for item in history.items if item.field == "status"]
-        date_current = cast(pendulum.DateTime, pendulum.parse(history.created))
-        date_current = TZ.convert(date_current)
+        date_current = parse_dt(history.created)
 
         for item in status_items:
             # Track total blocked time.
@@ -93,10 +92,9 @@ def status_on(issue: Issue, date: pendulum.Date) -> str:
     status = "Created"
 
     for history in sorted(issue.changelog.histories, key=_created):
-        date_current = cast(pendulum.DateTime, pendulum.parse(history.created))
-        date_current = TZ.convert(date_current)
+        date_current = parse_date(history.created)
 
-        if date_current.date() > date:
+        if date_current >= date:
             break
 
         status_items = [item for item in history.items if item.field == "status"]
