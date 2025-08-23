@@ -6,10 +6,12 @@ import pytest
 
 @pytest.fixture(scope="session")
 def vcr_config():
+    record_mode = os.environ.get("VCR_RECORD_MODE", "none")
+
     return {
         "serializer": "yaml",
         "cassette_library_dir": "tests/cassettes",
-        "record_mode": "once",
+        "record_mode": record_mode,
         "match_on": ["uri", "method"],
         "filter_headers": [
             "authorization",
