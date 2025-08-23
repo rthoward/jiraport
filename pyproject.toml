@@ -26,6 +26,7 @@ dev = [
     "nuitka>=2.7.12",
     "pyinstaller>=6.0.0",
     "pytest>=8.4.1",
+    "pytest-vcr>=1.0.2",
     "ruff>=0.12.9",
     "vcrpy>=6.0.0",
 ]
